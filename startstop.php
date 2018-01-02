@@ -1,8 +1,8 @@
 <?php
 include ("header.php");
 include ("pass.php");
-$walletDir = "/home/stakebox/wallets/".$currentWallet;
-$dataDir = "/home/stakebox/.Hyper";
+$walletDir = "/home/pi/SocialSend/src/";
+$dataDir = "/home/pi/.send";
 ?>
 
 <div style="padding: 5px 30px 0px;">
@@ -42,14 +42,14 @@ if ($status == "start"){
     chdir($walletDir);
     echo getcwd() . "\n";
     echo "$currentWallet"." -datadir="."$dataDir";
-    shell_exec("$currentWallet"." -datadir="."$dataDir"); 
+    shell_exec("sendd"." -datadir="."$dataDir"); 
     print '<h2>The wallet is starting, it could take several minutes before it is available.</h2>';
 
 } 
 if ($status == "rescan"){ 
    
     chdir($walletDir);
-    exec($currentWallet -rescan); 
+    exec("sendd -rescan"); 
     print '<h2>The wallet is starting with the rescan option, it may take a while before it becomes available again.</h2>';
 
 } 
