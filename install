@@ -1,1 +1,4 @@
-sudo cp -R *.* /var/www/html
+sudo rm -r /var/www/html/*
+cp -r /home/pi/SendPi/* /var/www/html/
+cp /home/pi/SendPi/.htaccess /var/www/html/
+mkdir /var/www/html/dataUI/wallets
