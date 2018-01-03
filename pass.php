@@ -44,7 +44,9 @@ if (isset($_POST['newPass']) )
 
 		include("createConfig.php");
 
-		generateConfigFile();
+		if (!generateConfigFile()){
+			echo "<h2>Error creating config file.</h2>";
+		}
 
 		if(createPasswordFile($_POST['newPass'])){
 
