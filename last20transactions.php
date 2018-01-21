@@ -1,8 +1,56 @@
 <?php
 include("header.php");
 include("pass.php");
-$trans = $coin->listtransactions('*', 20);
-$x = array_reverse($trans);
+$trans = $coin->listtransactions('*', 100);
+$prearrayx = array_reverse($trans);
+
+$x = array();
+
+foreach ($prearrayx as $item) {
+    if($x[$item['txid']]){
+        if( $item['amount'] == 0){
+            $x[$item['txid']]['amount'] += (float)$item['fee'];
+        }else{
+            $x[$item['txid']]['amount'] += (float)$item['amount'];
+        }
+        $x[$item['txid']]['category'] = "mined";
+
+        if ($x[$item['txid']]['account'] == ""){
+            $x[$item['txid']]['account'] = $item['account'];
+        }
+        if($item['fee']){
+            $x[$item['txid']]['fee'] += $item['fee'];
+        }
+    }else{
+        $x[$item['txid']] = array();
+        if( $item['amount'] == 0){
+            $x[$item['txid']]['amount'] = (float)$item['fee'];
+        }else{
+            $x[$item['txid']]['amount'] = (float)$item['amount'];
+        }
+        $x[$item['txid']]['txid'] = $item['txid'];
+        $x[$item['txid']]['category'] = $item['category'];
+        $x[$item['txid']]['confirmations'] = $item['confirmations'];
+        $x[$item['txid']]['time'] = $item['time'];
+        $x[$item['txid']]['account'] = $item['account'];
+        $x[$item['txid']]['comment'] = $item['comment'];
+        $x[$item['txid']]['address'] = $item['address'];
+        if($item['fee']){
+            $x[$item['txid']]['fee'] = $item['fee'];
+        }else{
+            $x[$item['txid']]['fee'] = 0;
+        }
+
+
+    }
+}
+$l = count($x);
+if ($l > 20){
+    $l = 20;
+}else{
+    $l -= 1;
+}
+$x = array_slice($x, 0, $l);
 ?>
 
 <p><b>Last 20 Transactions:</b></p>
@@ -26,25 +74,23 @@ $x = array_reverse($trans);
             else {
                 $colorconfirms = "red";
             }
-	    if($x['category'] == generate && $currentWallet == HYPER){
-		$getTransaction = $coin->gettransaction($x['txid']);
-		$fee = array_reverse($getTransaction);
-		$amount = $fee['fee'];
-		$x['amount'] = $amount;
-		$y = array_reverse($fee['vout']);
-		$z = array_reverse($y[0]);
-		$q = array_reverse($z['scriptPubKey']);
-		$f = array_reverse($q['addresses']);
-		$address = array_reverse($z['0']);
-		$x['address'] = $f[0];
-	    }
+	    
             $date = date('D M j y g:i a', $x['time']);
+            if ($x['amount'] == 0) {
+                $x['amount'] = $x['fee'];
+                $x['category'] = "self Payment";
+            }
+
+            if ($x['confirmations'] == -1){
+                $x['category'] = "orphan";
+            }
             echo "<tr>";
             echo "<td>" . ucfirst($x['category']) . "</td>";
+
 	  if ($x['comment'] != "") {
             echo "<td>{$x['address']}</td>
-                <td><div style='width:60px;overflow:hidden'>{$x['account']}</div></td>
-                <td><div style='width:70px;overflow:hidden'><font color='{$coloramount}'>{$x['amount']}</font></div></td>
+                <td><div style='width:100%;overflow:hidden'>{$x['account']}</div></td>
+                <td><div style='width:100%;overflow:hidden'><font color='{$coloramount}'>" . exp_to_dec($x['amount']) . "</font></div></td>
 		<td><div style='width:110px;overflow:hidden'><font color='{$colorconfirms}'>{$x['confirmations']}</font></div></td>
                 <td>{$date}</td>
                 <td><div style='width:120px;overflow:hidden'>{$x['txid']}</div></td>
@@ -54,8 +100,8 @@ $x = array_reverse($trans);
 	  elseif(file_exists($commentFile)){
 	   include("$commentFile");
             echo "<td>{$x['address']}</td>
-                <td><div style='width:60px;overflow:hidden'>{$x['account']}</div></td>
-                <td><div style='width:70px;overflow:hidden'><font color='{$coloramount}'>{$x['amount']}</font></div></td>
+                <td><div style='width:100%;overflow:hidden'>{$x['account']}</div></td>
+                <td><div style='width:100%;overflow:hidden'><font color='{$coloramount}'>" . exp_to_dec($x['amount']) . "</font></div></td>
 		<td><div style='width:110px;overflow:hidden'><font color='{$colorconfirms}'>{$x['confirmations']}</font></div></td>
                 <td>{$date}</td>
                 <td><div style='width:120px;overflow:hidden'>{$x['txid']}</div></td>
@@ -64,8 +110,8 @@ $x = array_reverse($trans);
 	  }
 	  else {
             echo "<td>{$x['address']}</td>
-                <td><div style='width:60px;overflow:hidden'>{$x['account']}</div></td>
-                <td><div style='width:70px;overflow:hidden'><font color='{$coloramount}'>{$x['amount']}</font></div></td>
+                <td><div style='width:100%;overflow:hidden'>{$x['account']}</div></td>
+                <td><div style='width:100%;overflow:hidden'><font color='{$coloramount}'>" . exp_to_dec($x['amount']) . "</font></div></td>
 		<td><div style='width:110px;overflow:hidden'><font color='{$colorconfirms}'>{$x['confirmations']}</font></div></td>
                 <td>{$date}</td>
                 <td><div style='width:120px;overflow:hidden'>{$x['txid']}</div></td>
